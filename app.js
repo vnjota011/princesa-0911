@@ -125,7 +125,7 @@
   /* ── Estágios ── */
   const stages = [
     ['BEM-VINDA AO SEU REINO', 'Feliz aniversário, minha princesa.', 'Seu cavaleiro e seu pequeno companheiro prepararam uma aventura para você. Vamos descobrir o que o jardim guarda?', 'Entrar no jardim'],
-    ['01 · O JARDIM ENCANTADO', 'Cinco pequenas luzes.', 'Toque nos cinco vaga-lumes para iluminar o caminho. Eles também podem ser alcançados com a tecla Tab.', 'Seguir as luzes'],
+    ['01 · O JARDIM ENCANTADO', 'Cinco pequenas luzes.', 'Toque nos cinco vaga-lumes para iluminar o caminho.', 'Seguir as luzes'],
     ['02 · MEMÓRIAS DO REINO', 'Nós, em cada detalhe.', 'Encontre os cinco pares. Cada carta guarda um pedacinho de nós.', 'Guardar essas memórias'],
     ['03 · A BUSCA DO PORQUINHO', 'Carinho escondido pelo jardim.', 'Nosso companheirinho escondeu três pequenos presentes. Encontre os símbolos dourados.', 'Levar o carinho comigo'],
     ['04 · UM PERGAMINHO ESPECIAL', 'Uma mensagem em pedacinhos.', 'Toque em dois pedaços para trocar suas posições e montar a frase, da esquerda para a direita.', 'Abrir a carta'],
