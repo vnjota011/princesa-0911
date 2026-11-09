@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070910">
+  <meta name="description" content="Uma pequena aventura no reino de Bruna — preparada com carinho.">
+  <meta property="og:title" content="O reino de Bruna · 09/11">
+  <meta property="og:description" content="Uma aventura especial para você.">
+  <meta property="og:type" content="website">
+  <title>O reino de Bruna · 09/11</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js" defer></script>
+  <script src="sleep.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div id="preview-bar" hidden>
+    Prévia de aniversário
+    <button type="button" id="preview-lock">Ver antes de 09/11</button>
+  </div>
+
+  <main>
+    <section id="intro" aria-label="A princesa adormecida">
+      <div id="sleep-scene">
+        <canvas width="768" height="480" role="img"
+          aria-label="A princesa Bruna e seu porquinho dormem sob uma luz dourada, entre vaga-lumes."></canvas>
+        <span class="loading">Preparando um sonho…</span>
+      </div>
+      <div id="wake-controls">
+        <button id="wake-button" class="gold" type="button" hidden>Acordar a princesa</button>
+        <p id="wake-status" role="status"></p>
+      </div>
+      <audio id="wake-music" src="assets/until-i-found-you.mp3" preload="auto"></audio>
+    </section>
+
+    <section id="adventure" hidden>
+      <header>
+        <a href="./index.html" class="brand" aria-label="O reino de Bruna">
+          ♛ <span>O reino de Bruna</span>
+        </a>
+        <span id="chapter-count" aria-live="polite"></span>
+        <button type="button" id="sound-toggle" class="quiet" aria-label="Ativar ou desativar sons" title="Som">♪</button>
+        <button type="button" id="restart" class="quiet">Recomeçar</button>
+      </header>
+
+      <div class="journey" role="progressbar" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1">
+        <span id="journey-fill"></span>
+      </div>
+
+      <div class="landscape" id="landscape">
+        <div class="sky-shade"></div>
+        <div class="stars" aria-hidden="true"></div>
+        <img src="assets/cavaleiro.webp" class="knight" alt="Vinícius como um cavaleiro de armadura escura e dourada" width="130" height="175">
+        <div class="awake-sprite" role="img" aria-label="Princesa Bruna e seu porquinho acordados"></div>
+        <div class="landscape-title">
+          <span class="eyebrow" id="scene-label"></span>
+          <h1 id="scene-title"></h1>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p id="intro-copy" class="lead"></p>
+        <div id="game"></div>
+        <p id="status" role="status" aria-live="polite"></p>
+        <div class="actions">
+          <button type="button" id="continue" class="gold"></button>
+          <button type="button" id="skip" class="quiet" hidden>Pular este jogo</button>
+        </div>
+      </div>
+
+      <footer>Uma pequena aventura, preparada com carinho por Vinícius.</footer>
+    </section>
+  </main>
+
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+</body>
+</html>

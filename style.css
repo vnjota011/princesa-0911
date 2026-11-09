@@ -1,0 +1,667 @@
+:root {
+  color-scheme: dark;
+  --gold: #ecc782;
+  --cream: #f6ecd7;
+  --muted: #beb6b0;
+  --ink: #090b13;
+  --line: #51412c;
+  --panel: #0e1018;
+  --soft-gold: #f2d59b;
+}
+
+* { box-sizing: border-box; }
+
+html { min-height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: Georgia, 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #fff1a8;
+  outline-offset: 5px;
+}
+button:disabled { cursor: default; opacity: .6; }
+[hidden] { display: none !important; }
+
+main { width: 100%; max-width: 1120px; margin: 0 auto; }
+
+/* ── Introdução / sono ── */
+#intro {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #030405;
+  padding-block: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-bottom));
+}
+
+#sleep-scene { position: relative; width: 100%; }
+#sleep-scene canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+#sleep-scene .loading {
+  position: absolute;
+  inset: 65% 0 auto;
+  text-align: center;
+  color: var(--muted);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+#wake-controls {
+  text-align: center;
+  min-height: 112px;
+  padding: 8px max(20px, env(safe-area-inset-right)) 32px max(20px, env(safe-area-inset-left));
+}
+#wake-status {
+  font-size: 16px;
+  color: var(--gold);
+  min-height: 1.4em;
+}
+
+/* ── Botões ── */
+.gold {
+  color: #23170d;
+  background: linear-gradient(#f2d59b, #d6ac62);
+  border: 1px solid #ffe2a6;
+  box-shadow: 0 4px 0 #75522b, 0 0 26px #dca74418;
+  padding: 15px 27px;
+  font-size: 17px;
+  min-height: 50px;
+  letter-spacing: .2px;
+  border-radius: 3px;
+  transition: filter .2s, transform .2s, box-shadow .2s;
+}
+.gold:hover:not(:disabled) {
+  filter: brightness(1.09);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #75522b, 0 0 32px #dca74428;
+}
+.gold:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #75522b;
+}
+
+.quiet {
+  border: 0;
+  background: transparent;
+  color: #cfc1aa;
+  padding: 12px;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.quiet:hover { color: var(--gold); }
+
+#preview-bar {
+  background: #302544;
+  color: #efe3ff;
+  text-align: center;
+  min-height: 44px;
+  padding: 9px 15px;
+  font: 13px system-ui, sans-serif;
+}
+#preview-bar button {
+  background: none;
+  color: inherit;
+  border: 1px solid #9583b0;
+  padding: 5px 10px;
+  min-height: 44px;
+  margin-left: 8px;
+  border-radius: 3px;
+}
+
+/* ── Cabeçalho da aventura ── */
+header {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 max(32px, env(safe-area-inset-right)) 0 max(32px, env(safe-area-inset-left));
+  background: #0b0d16;
+  border-bottom: 1px solid #1a1c28;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--gold);
+  font-size: 24px;
+}
+.brand span { font-size: 18px; }
+#chapter-count {
+  margin-left: auto;
+  color: #b6a68e;
+  font: 12px monospace;
+  letter-spacing: 1px;
+}
+#sound-toggle {
+  font-size: 18px;
+  text-decoration: none;
+  padding: 8px 10px;
+  opacity: .7;
+}
+#sound-toggle.on { opacity: 1; color: var(--gold); }
+#sound-toggle.off { opacity: .35; text-decoration: line-through; }
+
+.journey {
+  height: 3px;
+  background: #342f2b;
+}
+.journey span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #b88836, var(--gold));
+  transition: width .55s cubic-bezier(.4, 0, .2, 1);
+  box-shadow: 0 0 8px #ecc78255;
+}
+
+/* ── Paisagem ── */
+.landscape {
+  height: 380px;
+  background: url('assets/jardim.webp') center 48% / cover;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  image-rendering: pixelated;
+  transition: background-position .8s ease;
+}
+.sky-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, #090b13 0%, #090b1300 65%);
+  pointer-events: none;
+}
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff8 0%, transparent 100%),
+    radial-gradient(1px 1px at 28% 8%, #fff6 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 22%, #fff5 0%, transparent 100%),
+    radial-gradient(1px 1px at 62% 12%, #fff7 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 78% 28%, #fff4 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 15%, #fff6 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 35%, #fff3 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 5%, #fff5 0%, transparent 100%);
+  animation: twinkle 6s ease-in-out infinite alternate;
+  opacity: .7;
+}
+.landscape-title {
+  position: absolute;
+  z-index: 2;
+  bottom: 24px;
+  left: 32px;
+  right: 32px;
+  text-align: center;
+  text-shadow: 0 2px 12px #000c, 0 0 40px #0008;
+}
+.eyebrow {
+  font: 12px monospace;
+  letter-spacing: 3px;
+  color: var(--gold);
+  display: block;
+}
+h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 400;
+  margin: 12px 0 0;
+  line-height: 1.15;
+}
+.knight {
+  position: absolute;
+  width: 130px;
+  height: 175px;
+  object-fit: contain;
+  bottom: 72px;
+  left: 10%;
+  filter: drop-shadow(0 8px 4px #0008);
+  image-rendering: pixelated;
+  transition: left .6s ease, bottom .6s ease;
+}
+.awake-sprite {
+  position: absolute;
+  width: 250px;
+  height: 125px;
+  bottom: 73px;
+  right: 6%;
+  background: url('assets/despertar.webp') 100% 100% / 200% 200%;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 5px 4px #0008);
+  transition: right .6s ease, bottom .6s ease;
+}
+
+/* ── Painel de conteúdo ── */
+.panel {
+  padding: 22px 36px 36px;
+  max-width: 840px;
+  margin: auto;
+  text-align: center;
+  min-height: 280px;
+  animation: fadeUp .45s ease;
+}
+.lead {
+  font-size: 18px;
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 12px auto 24px;
+  color: #dfd4c1;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+#status {
+  min-height: 28px;
+  color: var(--gold);
+  font-size: 16px;
+  line-height: 1.6;
+  transition: opacity .3s;
+}
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #8d8580;
+  padding: 10px max(20px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+
+/* ── Jogo da memória ── */
+.memory {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  max-width: 680px;
+  margin: auto;
+}
+.memory-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  perspective: 800px;
+  border: 0;
+  padding: 0;
+  background: none;
+  border-radius: 6px;
+  transition: transform .2s;
+}
+.memory-card:hover:not(:disabled):not(.matched) {
+  transform: translateY(-3px);
+}
+.card-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform .5s cubic-bezier(.4, .1, .2, 1);
+}
+.memory-card.revealed .card-inner,
+.memory-card.matched .card-inner {
+  transform: rotateY(180deg);
+}
+.card-back,
+.card-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 6px;
+}
+.card-back {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(45deg, #232031 0 8px, #262337 8px 9px);
+  border: 1px solid #927349;
+  outline: 1px solid #493b30;
+  outline-offset: -7px;
+  color: #e4c58a;
+  font-size: 32px;
+}
+.card-photo {
+  transform: rotateY(180deg);
+  object-fit: cover;
+  border: 2px solid #d6b776;
+}
+.memory-card.matched {
+  box-shadow: 0 0 22px #e8bc5255;
+  animation: matchPulse .5s ease;
+}
+.memory-card.matched .card-photo {
+  border-color: #f0d080;
+}
+
+/* ── Jardim / vaga-lumes / presentes ── */
+.garden-game {
+  position: relative;
+  height: 300px;
+  border: 1px solid #5b5139;
+  background:
+    linear-gradient(#08152855, #08152833),
+    url('assets/jardim.webp') center 65% / cover;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: inset 0 0 40px #0006;
+}
+.firefly {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background: none;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  transition: opacity .35s, transform .35s;
+}
+.firefly span {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff4a0;
+  box-shadow: 0 0 10px 5px #ffe88188, 0 0 28px 14px #e9d55430;
+  animation: glow 2.5s ease-in-out infinite alternate;
+}
+.firefly:focus-visible { outline-offset: -2px; }
+.firefly.caught {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.8);
+  pointer-events: none;
+}
+
+.treasure {
+  position: absolute;
+  min-width: 48px;
+  min-height: 48px;
+  border: 1px solid #b18b58;
+  background: #372b28bb;
+  color: #f4d28c;
+  font: 24px monospace;
+  box-shadow: 0 0 14px #0006;
+  border-radius: 4px;
+  transition: transform .25s, background .3s, color .3s, box-shadow .3s;
+}
+.treasure:hover:not(:disabled) {
+  transform: scale(1.12);
+  box-shadow: 0 0 18px #ecc78244;
+}
+.treasure.found {
+  background: #b79c5d;
+  color: #1a1610;
+  pointer-events: none;
+  box-shadow: 0 0 20px #ecc78266;
+  animation: matchPulse .45s ease;
+}
+
+.clues {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+  color: var(--gold);
+  font-size: 16px;
+}
+.clues p {
+  margin: 0;
+  padding: 10px 16px;
+  background: #16141f;
+  border-left: 3px solid var(--gold);
+  border-radius: 0 4px 4px 0;
+  text-align: left;
+  animation: fadeUp .4s ease;
+}
+
+/* ── Quebra-cabeça ── */
+.puzzle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 600px;
+  margin: auto;
+}
+.puzzle button {
+  background: #d9c49e;
+  color: #392819;
+  border: 1px solid #ad8c59;
+  min-height: 95px;
+  padding: 12px;
+  font-size: 19px;
+  box-shadow: inset 0 0 25px #9b733530;
+  border-radius: 4px;
+  transition: transform .2s, outline .15s, box-shadow .2s;
+}
+.puzzle button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 25px #9b733530, 0 4px 12px #0004;
+}
+.puzzle button.selected {
+  outline: 3px solid #ffdc80;
+  outline-offset: 2px;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px #0005;
+}
+.puzzle button.correct {
+  background: #c9e0a8;
+  border-color: #7a9e4e;
+  pointer-events: none;
+}
+.puzzle button:disabled:not(.correct) {
+  opacity: .85;
+}
+
+/* ── Carta ── */
+.letter {
+  padding: 32px 36px;
+  background: linear-gradient(160deg, #ebe0c8, #e0d0b0);
+  color: #35291d;
+  text-align: left;
+  max-width: 580px;
+  margin: auto;
+  box-shadow: 0 12px 48px #0005, inset 0 0 0 1px #c9b48a;
+  border-top: 4px solid #b59056;
+  border-radius: 2px;
+  position: relative;
+  animation: fadeUp .5s ease;
+}
+.letter::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: 2px;
+}
+.letter p {
+  font-size: 18px;
+  line-height: 1.85;
+  margin: 0 0 1em;
+  position: relative;
+}
+.letter p:last-of-type { margin-bottom: 0; }
+.signature {
+  text-align: right;
+  font-style: italic;
+  margin-top: 1.5em !important;
+  color: #5a4630;
+}
+
+/* ── Finale ── */
+.final-portrait {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 220px;
+  gap: 8px;
+  animation: fadeUp .5s ease;
+}
+.final-portrait img {
+  height: 190px;
+  max-width: 35%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px #0007);
+}
+.final-portrait .awake-sprite {
+  position: static;
+  width: 300px;
+  height: 150px;
+  max-width: 60%;
+  filter: drop-shadow(0 6px 8px #0007);
+}
+
+/* ── Confetti ── */
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ── Animações ── */
+@keyframes glow {
+  to {
+    opacity: .45;
+    box-shadow: 0 0 6px 3px #ffe88166, 0 0 18px 8px #e9d55420;
+  }
+}
+@keyframes pulse {
+  0%, 100% { opacity: .5; }
+  50% { opacity: 1; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes matchPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes twinkle {
+  from { opacity: .5; }
+  to { opacity: .85; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  header {
+    min-height: 64px;
+    height: auto;
+    padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+    gap: 4px;
+  }
+  .brand {
+    gap: 8px;
+    min-width: 0;
+    min-height: 44px;
+    white-space: nowrap;
+  }
+  .brand span { font-size: clamp(13px, 3.2vw, 15px); }
+  #chapter-count { flex-shrink: 0; font-size: 10px; letter-spacing: 0; }
+  header .quiet { min-height: 44px; font-size: 12px; padding: 8px; white-space: nowrap; }
+  #sound-toggle {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    font-size: 16px;
+    padding: 0;
+  }
+
+  .landscape { height: clamp(240px, 30svh, 320px); }
+  .knight {
+    width: clamp(76px, 21vw, 96px);
+    height: auto;
+    max-height: 135px;
+    left: 5%;
+    bottom: clamp(72px, 10svh, 96px);
+  }
+  .awake-sprite {
+    width: clamp(150px, 40vw, 190px);
+    height: auto;
+    aspect-ratio: 2;
+    right: 3%;
+    bottom: clamp(72px, 10svh, 96px);
+  }
+  .landscape-title {
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    bottom: 16px;
+  }
+  h1 { font-size: clamp(24px, 6.5vw, 34px); }
+
+  .panel {
+    padding: 18px max(16px, env(safe-area-inset-right)) 28px max(16px, env(safe-area-inset-left));
+  }
+  .lead { font-size: clamp(15px, 4vw, 17px); margin-bottom: 18px; }
+
+  .memory {
+    gap: clamp(4px, 1.4vw, 8px);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .card-back {
+    font-size: 20px;
+    outline-offset: -4px;
+  }
+
+  .puzzle {
+    gap: clamp(6px, 1.8vw, 10px);
+  }
+  .puzzle button {
+    font-size: clamp(13px, 3.6vw, 16px);
+    min-height: clamp(72px, 18vw, 88px);
+    padding: 8px;
+  }
+
+  .letter { padding: clamp(18px, 5vw, 24px); }
+  .letter p { font-size: clamp(15px, 3.8vw, 17px); line-height: 1.75; }
+
+  .eyebrow { font-size: 10px; letter-spacing: 2px; }
+  .gold { font-size: 15px; padding: 13px 22px; }
+  .actions .quiet { min-height: 44px; }
+  .garden-game { height: clamp(240px, 30svh, 300px); }
+
+  .final-portrait { height: 180px; }
+  .final-portrait img { height: 150px; }
+  .final-portrait .awake-sprite {
+    width: 220px;
+    height: 110px;
+  }
+}
+
+@media (max-width: 380px) {
+  header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+  }
+  header .brand { overflow: hidden; }
+  .memory { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .card-back { font-size: 16px; }
+  .puzzle button { font-size: 13px; min-height: 64px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .stars { opacity: .6; }
+}
